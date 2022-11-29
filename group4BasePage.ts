@@ -1,4 +1,5 @@
 // Imported from class notes / qaHomeworkWiki / 2.8
+// See Mars's example from 11/23 class: https://github.com/MarohnHoward/group-number-projectpt9/blob/main/basePage.ts
 
 import {Builder, By, Capabilities, until, WebDriver, WebElement} from "selenium-webdriver";
 const chromedriver = require("chromedriver")
