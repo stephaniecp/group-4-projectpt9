@@ -29,8 +29,8 @@ describe ("Test for Restful Booker apllication.", () => {
         await booker.click(booker.bookBtn);
         await booker.driver.wait(until.elementsLocated(booker.alertBoxDiv));
         let error = await booker.driver.findElement(booker.alertBoxDiv).getText();
-        expect(error).toContain("must not be null")
-    })
+        expect(error).toContain("must not be null");
+    });
     test("Booker contact information.", async () => {
         await booker.setInput(booker.contactName, "Chad Bumstead");
         await booker.setInput(booker.contactEmail, "bumChad.email.com");
@@ -38,6 +38,6 @@ describe ("Test for Restful Booker apllication.", () => {
         await booker.setInput(booker.contactSubject, "honey moon");
         await booker.setInput(booker.contactMessage, "Me and my wife are looking to book this room for our honeymoon.");
         await booker.click(booker.submitContact);
-    })
+    });
 
-})
+});
