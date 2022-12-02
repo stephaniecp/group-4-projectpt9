@@ -8,7 +8,7 @@ describe('testing Hollie stuff', () => {
         await hollie.repeatClick(10, hollie.backBtn)
         await hollie.click(hollie.todayBtn)
         let currentDate = await hollie.getText(hollie.dateBanner)
-        expect(currentDate).toContain("November 2022")
+        expect(currentDate).toContain("December 2022")
         await hollie.driver.quit()
 
         
