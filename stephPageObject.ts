@@ -13,7 +13,7 @@ export class StephCal extends BasePage {
     byCalendarView: By = By.className("rbc-month-view") // verified path - $$('[class= "rbc-month-view"]')
     byCalendarRows: By = By.className("rbc-month-row") // verified path - $$('[class= "rbc-month-row"]')[0] 
     byCalendarDayCells: By = By.className("rbc-day-bg") // verified path - $$('[class= "rbc-day-bg"]')[0] 
-
+    byMonthString: By =By.className("rbc-toolbar-label") // verified path - $$('[class= "rbc-toolbar-label"]') 
 
     constructor(){
         super({url:"https://automationintesting.online/"})
@@ -28,14 +28,18 @@ export class StephCal extends BasePage {
         await this.click(this.byNextMonthBtn)
         console.log("Clicked the Next month CTA")
         let randomDayOfRandomWeek = (days: any[]) =>
-            days[Math.floor(Math.random()*days.length)]
+            days[Math.floor(Math.random()*days.length)] // Found how to do this at: https://www.wiserfirst.com/blog/typescript-random-array-element/
         console.log("Variable randomDayOfRandomWeek was created")
         let arrayOfDayCells = await this.getElements(this.byCalendarDayCells)
         console.log("Variable arrayOfDayCells was created")
         let randomDay:WebElement = randomDayOfRandomWeek(arrayOfDayCells)
-        console.log("Variable randomDay was created")
         await randomDay.click()
         console.log(`Random day selected is array item ${randomDay}`)
+
+    // Start of Click and hold
+        // Action act = new Action(this.selectDayNextMonth)
+    // End of Click and hold functionality
+
     } // getElements is necesary for "selectDayNextMonth" method
     async getElements(elementBy: By): Promise<WebElement[]> {
         await this.driver.wait(until.elementsLocated(elementBy));
@@ -43,5 +47,30 @@ export class StephCal extends BasePage {
         return elements;
     }
 
+    async viewSixMonthsFromCurrentMonth() {
+        for (let i = 0; i <7; i++) {
+            console.log(`For loop starting, i value: ${i}`)
+            await this.click(this.byNextMonthBtn)
+        }
+        console.log(`For loop ended`)
+        // Return statement not necessary since not returning any value
+        return undefined
+    }
+
+    async verifyNextMonthStringIsDifferent(): Promise<boolean> {
+        console.log("Starting to execute: verifyNextMonthStringIsDifferent")
+        const currentMonthString = await this.getText(this.byMonthString)
+        console.log(`Value of current month string is ${currentMonthString}`)
+        await this.click(this.byNextMonthBtn)
+        const nextMonthString = await this.getText(this.byMonthString)
+        console.log(`Value of next month string is ${nextMonthString}`)
+        return currentMonthString !== nextMonthString
+    }
+
+    // async selectTwoDaysRangeFromRandomDay() {
+    //     console.log("")
+    //     await this.click(this.selectDayNextMonth)
+        
+    // }
 
 }
