@@ -1,4 +1,4 @@
-import {By, WebElement, until} from 'selenium-webdriver' // Import added for selectDayNextMonth method
+import {By, WebElement, until, Origin, Button} from 'selenium-webdriver' // Import added for selectDayNextMonth method
 import {BasePage} from './group4BasePage'
 
 export class StephCal extends BasePage {
@@ -35,33 +35,87 @@ export class StephCal extends BasePage {
         let randomDay:WebElement = randomDayOfRandomWeek(arrayOfDayCells)
         await randomDay.click()
         console.log(`Random day selected is array item ${randomDay}`)
+    } 
+    
+    async selectDayElementByDayNumber(day: number): Promise<WebElement> {
+        const allMonthDaysArray = await this.getElements(this.byCalendarDayCells)
+        console.log(`selectDayElementByDayNumber: Found ${allMonthDaysArray.length} days in allMonthDaysArray`)
+        return allMonthDaysArray[day]
+    }
 
-    // Start of Click and hold
-        // Action act = new Action(this.selectDayNextMonth)
-    // End of Click and hold functionality
-
-    } // getElements is necesary for "selectDayNextMonth" method
+// Should be exported to personal basePage - getElements is necesary for "selectDayNextMonth" method
     async getElements(elementBy: By): Promise<WebElement[]> {
         await this.driver.wait(until.elementsLocated(elementBy));
         let elements = await this.driver.findElements(elementBy);
         return elements;
-    }
+    } 
 
-    async viewSixMonthsFromCurrentMonth() {
-        for (let i = 0; i <7; i++) {
-            console.log(`For loop starting, i value: ${i}`)
-            await this.click(this.byNextMonthBtn)
-        }
-        console.log(`For loop ended`)
-        // Return statement not necessary since not returning any value
-        return undefined
+// Should be exported to personal basePage 
+    /**
+     * Convenience method for drag and drop from the Actions API https://www.selenium.dev/documentation/webdriver/actions_api/
+     * @param fromElement - element to start the drag from
+     * @param toElement - element to drag to
+     * @returns 
+     */
+    async doDragAndDrop(fromElement: WebElement, toElement: WebElement): Promise<void> {
+        //required importing "Actions" 
+        // return this.driver.actions().dragAndDrop(fromElement, toElement).perform()
+        console.log(`doDragAndDrop: starting`)
+        const actionPause = 500
+        const actionPromise = this.driver
+                .actions()
+                .move({origin: fromElement, duration: 500}) //x:20, y:20, 
+                .pause(actionPause)
+                .press(Button.LEFT)
+                .move({origin: Origin.POINTER, x:5, y:5}) // test
+                .pause(actionPause)
+                .move({origin: toElement, duration: 2000})
+                .pause(actionPause)
+                .move({origin: Origin.POINTER, x:5, y:5}) // test
+                .release(Button.LEFT)
+                .pause(actionPause)
+                .perform();
+        console.log(`doDragAndDrop: Action promise constructed`)
+        return actionPromise
     }
+// Should be exported to personal basePage - add mouse icon to view what it's doing while running tests
+    /**
+    * Some debug code inspired by:
+    * https://stackoverflow.com/a/52669454
+    */
+    async showMouseMovement() {
+            const jsCode = `
+            function enableCursor() {
+                var seleniumFollowerImg = document.createElement('img');
+                seleniumFollowerImg.setAttribute('src', 'data:image/png;base64,'
+                + 'iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAQAAACGG/bgAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAA'
+                + 'HsYAAB7GAZEt8iwAAAAHdElNRQfgAwgMIwdxU/i7AAABZklEQVQ4y43TsU4UURSH8W+XmYwkS2I0'
+                + '9CRKpKGhsvIJjG9giQmliHFZlkUIGnEF7KTiCagpsYHWhoTQaiUUxLixYZb5KAAZZhbunu7O/PKf'
+                + 'e+fcA+/pqwb4DuximEqXhT4iI8dMpBWEsWsuGYdpZFttiLSSgTvhZ1W/SvfO1CvYdV1kPghV68a3'
+                + '0zzUWZH5pBqEui7dnqlFmLoq0gxC1XfGZdoLal2kea8ahLoqKXNAJQBT2yJzwUTVt0bS6ANqy1ga'
+                + 'VCEq/oVTtjji4hQVhhnlYBH4WIJV9vlkXLm+10R8oJb79Jl1j9UdazJRGpkrmNkSF9SOz2T71s7M'
+                + 'SIfD2lmmfjGSRz3hK8l4w1P+bah/HJLN0sys2JSMZQB+jKo6KSc8vLlLn5ikzF4268Wg2+pPOWW6'
+                + 'ONcpr3PrXy9VfS473M/D7H+TLmrqsXtOGctvxvMv2oVNP+Av0uHbzbxyJaywyUjx8TlnPY2YxqkD'
+                + 'dAAAAABJRU5ErkJggg==');
+                seleniumFollowerImg.setAttribute('id', 'selenium_mouse_follower');
+                seleniumFollowerImg.setAttribute('style', 'position: absolute; z-index: 99999999999; pointer-events: none; left:0; top:0');
+                document.body.appendChild(seleniumFollowerImg);
+                document.onmousemove = function (e) {
+                document.getElementById('selenium_mouse_follower').style.left = e.pageX + 'px';
+                document.getElementById('selenium_mouse_follower').style.top = e.pageY + 'px';
+                };
+            };
+            enableCursor();        
+            `
+            await this.driver.executeScript(jsCode);
+        }
 
     async verifyNextMonthStringIsDifferent(): Promise<boolean> {
         console.log("Starting to execute: verifyNextMonthStringIsDifferent")
         const currentMonthString = await this.getText(this.byMonthString)
         console.log(`Value of current month string is ${currentMonthString}`)
         await this.click(this.byNextMonthBtn)
+        await this.driver.sleep(1200)
         const nextMonthString = await this.getText(this.byMonthString)
         console.log(`Value of next month string is ${nextMonthString}`)
         return currentMonthString !== nextMonthString
