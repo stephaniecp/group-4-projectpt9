@@ -17,4 +17,4 @@ test('Map Navigation', async () => {
     await driver.quit()
 
 
-}
+})
