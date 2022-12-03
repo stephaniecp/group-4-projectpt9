@@ -38,7 +38,7 @@ describe("Calendar view opens and user can select dates", () => {
     test("Can select date range in the future", async() => {
         const fromDay = await stephCal.selectDayElementByDayNumber(8)
         const toDay = await stephCal.selectDayElementByDayNumber(10)
-        await stephCal.doDragAndDrop(fromDay, toDay)
+        await stephCal.ExprimentDoDragAndDrop(fromDay, toDay)
         console.log(`Done with drag and drop/date selection`)
         const hilightedDates = await stephCal.getElements(stephCal.byHilightedDates)
         expect(hilightedDates.length).toBeGreaterThan(0)

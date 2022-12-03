@@ -78,6 +78,26 @@ export class StephCal extends BasePage {
         console.log(`doDragAndDrop: Action promise constructed`)
         return actionPromise
     }
+    // Temporary experiment to debug drag and drop
+    async ExprimentDoDragAndDrop(fromElement: WebElement, toElement: WebElement): Promise<void> {
+        //required importing "Actions" 
+        // return this.driver.actions().dragAndDrop(fromElement, toElement).perform()
+        console.log(`doDragAndDrop: starting`)
+        const actionPause = 500
+        const actionPromise = this.driver
+                .actions()
+                .move({origin: fromElement, duration: 500}) //x:20, y:20, 
+                .pause(actionPause)
+                .dragAndDrop(fromElement, toElement) // test
+                .pause(actionPause)
+                .move({origin: toElement, duration: 2000})
+                .pause(actionPause)
+                .move({origin: Origin.POINTER, x:5, y:5}) // test
+                .pause(actionPause)
+                .perform();
+        console.log(`doDragAndDrop: Action promise constructed`)
+        return actionPromise
+    }
 // Should be exported to personal basePage - add mouse icon to view what it's doing while running tests
     /**
     * Some debug code inspired by:
