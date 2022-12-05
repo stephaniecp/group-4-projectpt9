@@ -1,4 +1,4 @@
-import {By, WebElement, until, Origin, Button} from 'selenium-webdriver' // Import added for selectDayNextMonth method
+import {By, WebElement, until, Origin, Button, Actions} from 'selenium-webdriver' // Import added for selectDayNextMonth method
 import {BasePage} from './group4BasePage'
 
 export class StephCal extends BasePage {
@@ -50,54 +50,6 @@ export class StephCal extends BasePage {
         return elements;
     } 
 
-// Should be exported to personal basePage 
-    /**
-     * Convenience method for drag and drop from the Actions API https://www.selenium.dev/documentation/webdriver/actions_api/
-     * @param fromElement - element to start the drag from
-     * @param toElement - element to drag to
-     * @returns 
-     */
-    async doDragAndDrop(fromElement: WebElement, toElement: WebElement): Promise<void> {
-        //required importing "Actions" 
-        // return this.driver.actions().dragAndDrop(fromElement, toElement).perform()
-        console.log(`doDragAndDrop: starting`)
-        const actionPause = 500
-        const actionPromise = this.driver
-                .actions()
-                .move({origin: fromElement, duration: 500}) //x:20, y:20, 
-                .pause(actionPause)
-                .press(Button.LEFT)
-                .move({origin: Origin.POINTER, x:5, y:5}) // test
-                .pause(actionPause)
-                .move({origin: toElement, duration: 2000})
-                .pause(actionPause)
-                .move({origin: Origin.POINTER, x:5, y:5}) // test
-                .release(Button.LEFT)
-                .pause(actionPause)
-                .perform();
-        console.log(`doDragAndDrop: Action promise constructed`)
-        return actionPromise
-    }
-    // Temporary experiment to debug drag and drop
-    async ExprimentDoDragAndDrop(fromElement: WebElement, toElement: WebElement): Promise<void> {
-        //required importing "Actions" 
-        // return this.driver.actions().dragAndDrop(fromElement, toElement).perform()
-        console.log(`doDragAndDrop: starting`)
-        const actionPause = 500
-        const actionPromise = this.driver
-                .actions()
-                .move({origin: fromElement, duration: 500}) //x:20, y:20, 
-                .pause(actionPause)
-                .dragAndDrop(fromElement, toElement) // test
-                .pause(actionPause)
-                .move({origin: toElement, duration: 2000})
-                .pause(actionPause)
-                .move({origin: Origin.POINTER, x:5, y:5}) // test
-                .pause(actionPause)
-                .perform();
-        console.log(`doDragAndDrop: Action promise constructed`)
-        return actionPromise
-    }
 // Should be exported to personal basePage - add mouse icon to view what it's doing while running tests
     /**
     * Some debug code inspired by:
@@ -141,10 +93,41 @@ export class StephCal extends BasePage {
         return currentMonthString !== nextMonthString
     }
 
-    // async selectTwoDaysRangeFromRandomDay() {
-    //     console.log("")
-    //     await this.click(this.selectDayNextMonth)
-        
-    // }
+    actionWiggle(actions:Actions, originElement:WebElement, moveDurationMs:number=100):Actions {
+        let result:Actions = actions.move({origin: originElement, duration: moveDurationMs}) 
+        actions = actions.move({origin: originElement, x: 10, y: 0, duration: moveDurationMs}) 
+        result = actions.move({origin: originElement, x: 0, y: -10, duration: moveDurationMs}) 
+        result = actions.move({origin: originElement, x: -10, y: 0, duration: moveDurationMs}) 
+        result = actions.move({origin: originElement, x: 0, y: 10, duration: moveDurationMs}) 
+        result = actions.pause(moveDurationMs)
+        return result;
+    }
 
+    actionPressWiggle(actions:Actions, originElement:WebElement, moveDurationMs:number=100):Actions {
+        actions = this.actionWiggle(actions, originElement, moveDurationMs);
+        actions.press(Button.LEFT)
+        return this.actionWiggle(actions, originElement, moveDurationMs)
+    }
+
+    actionReleaseWiggle(actions:Actions, originElement:WebElement, moveDurationMs:number=100):Actions {
+        actions = this.actionWiggle(actions, originElement, moveDurationMs);
+        actions.release(Button.LEFT)
+        return this.actionWiggle(actions, originElement, moveDurationMs)        
+    }
+
+    async doPressHoldMoveRelease(fromElement: WebElement, toElement: WebElement): Promise<void> {
+        //required importing "Actions" 
+        // return this.driver.actions().dragAndDrop(fromElement, toElement).perform()
+        console.log(`doPressHoldMoveRelease phase=Start`)
+        const moveDuration = 50
+        await this.driver.actions().clear()
+        let actions = this.driver.actions()
+
+        actions = this.actionPressWiggle(actions, fromElement, moveDuration)
+        actions = this.actionReleaseWiggle(actions, toElement, moveDuration)
+
+        const actionPromise:Promise<void> = actions.perform();
+        console.log(`doPressHoldMoveRelease phase=Done`)
+        return await actionPromise
+    }
 }

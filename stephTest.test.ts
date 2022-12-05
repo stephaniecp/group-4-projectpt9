@@ -26,28 +26,29 @@ describe("Calendar view opens and user can select dates", () => {
     })
 
     // Verified test (12/02)
-    // TO EDIT BACK TO i=7 BEFORE PUSHING
     test("Can view at least six months in the future", async () => {
         console.log("starting: Can view at least six months in the future ") 
-        for (let i = 0; i <3; i++) {
+        for (let i = 0; i <7; i++) {
             expect(await stephCal.verifyNextMonthStringIsDifferent()).toBe(true)
         }
         console.log("Finishing: Can view at least six months in the future") 
     })
 
+    // Verified test (12/04)
     test("Can select date range in the future", async() => {
         const fromDay = await stephCal.selectDayElementByDayNumber(8)
         const toDay = await stephCal.selectDayElementByDayNumber(10)
-        await stephCal.ExprimentDoDragAndDrop(fromDay, toDay)
+        await stephCal.doPressHoldMoveRelease(fromDay, toDay)
         console.log(`Done with drag and drop/date selection`)
         const hilightedDates = await stephCal.getElements(stephCal.byHilightedDates)
+        console.log(`Found ${hilightedDates.length} highlited dates`)
         expect(hilightedDates.length).toBeGreaterThan(0)
     })
 
     // NOT A TEST: To close the browser once tests are done executing
-    // afterAll(async () => {
-    //     await stephCal.driver.quit()
-    //     console.log("Browser quit")
-    // });
+    afterAll(async () => {
+        await stephCal.driver.quit()
+        console.log("Browser quit")
+    });
         
 })
