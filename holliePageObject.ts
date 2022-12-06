@@ -7,6 +7,7 @@ export class Hollie extends BasePage {
     nextBtn: By = By.xpath('//button[text()= "Next"]')
     todayBtn: By = By.xpath('//button[text()= "Today"]')
     dateBanner: By = By.xpath('//span[@class= "rbc-toolbar-label"]')
+    hackBtn: By = By.xpath('//button[text()= "Let me hack!"]')
 
     constructor() {
         super({url: "https://automationintesting.online/"})
