@@ -21,7 +21,7 @@ describe("Calendar view opens and user can select dates", () => {
     // Verified test (11/30)
     test("Can pick a random day on the following month", async() => {
         console.log("Starting second test execution")
-        await stephCal.selectDayNextMonth()
+        await stephCal.selectRandomDayNextMonth()
         console.log("Picked a random day from the test file") 
     })
 
